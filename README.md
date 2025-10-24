@@ -1,6 +1,10 @@
-# RugFork 🚀
+# rugs.fun-fork 
 
 A professional, gamified crypto trading platform on Solana, inspired by rugs.fun with enhanced trader-friendly features and advanced analytics.
+<p align="center">
+  <img src="docs/rugfork.png" alt="RugFork platform preview" width="600"/>
+</p>
+
 
 ## 🎯 Project Overview
 
@@ -11,6 +15,12 @@ RugFork is a Solana-based platform that replicates rugs.fun's core mechanics whi
 - **Adjustable prize pool splits** - Flexible tournament rewards
 - **RugPass NFT system** - Leveling and rewards
 - **Cross-chain support** - Future expansion ready
+
+## 📞 Contact Me
+
+[![Telegram](https://img.shields.io/badge/Telegram-%40lorine93s-229ED9?logo=telegram)](https://t.me/lorine93s)
+[![Twitter](https://img.shields.io/badge/Twitter-%40kakamajo__btc-1da1f2?logo=twitter)](https://twitter.com/kakamajo_btc)
+[![Email](https://img.shields.io/badge/Email-xsui46941%40gmail.com-c14438?logo=gmail)](mailto:xsui46941@gmail.com)
 
 ## ✨ Key Features
 
