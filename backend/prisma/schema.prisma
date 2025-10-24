@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  walletAddress String    @unique
+  username      String?   @unique
+  email         String?   @unique
+  avatar        String?
+  totalXp       Int       @default(0)
+  level         Int       @default(1)
+  totalBets     Int       @default(0)
+  totalWinnings BigInt    @default(0)
+  totalLosses   BigInt    @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastActiveAt  DateTime  @default(now())
+
+  // Relations
+  bets          Bet[]
+  pools         Pool[]
+  transactions  Transaction[]
+  achievements  UserAchievement[]
+
+  @@map("users")
+}
+
+model Pool {
+  id            String    @id @default(cuid())
+  tokenMint     String    @unique
+  tokenName     String?
+  tokenSymbol   String?
+  tokenUri      String?
+  liquidity     BigInt   @default(0)
+  totalVolume   BigInt   @default(0)
+  totalBets     Int      @default(0)
+  isActive      Boolean  @default(true)
+  rugScore      Int      @default(0)
+  crashPoint    Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  crashedAt     DateTime?
+
+  // Relations
+  creatorId     String
+  creator       User     @relation(fields: [creatorId], references: [id])
+  bets          Bet[]
+  transactions  Transaction[]
+
+  @@map("pools")
+}
+
+model Bet {
+  id          String    @id @default(cuid())
+  amount      BigInt
+  multiplier  Int
+  isSettled   Boolean   @default(false)
+  winnings    BigInt    @default(0)
+  createdAt   DateTime  @default(now())
+  settledAt   DateTime?
+  crashPoint  Float?
+
+  // Relations
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  poolId      String
+  pool        Pool      @relation(fields: [poolId], references: [id])
+
+  @@map("bets")
+}
+
+model Transaction {
+  id          String    @id @default(cuid())
+  signature   String    @unique
+  type        TransactionType
+  amount      BigInt
+  status      TransactionStatus @default(PENDING)
+  createdAt   DateTime  @default(now())
+  confirmedAt DateTime?
+
+  // Relations
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  poolId      String?
+  pool        Pool?     @relation(fields: [poolId], references: [id])
+
+  @@map("transactions")
+}
+
+model Achievement {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  icon        String?
+  xpReward    Int       @default(0)
+  criteria    Json      // Store achievement criteria as JSON
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String    @id @default(cuid())
+  unlockedAt    DateTime  @default(now())
+
+  // Relations
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  achievementId String
+  achievement   Achievement  @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model Leaderboard {
+  id        String    @id @default(cuid())
+  type      LeaderboardType
+  period    LeaderboardPeriod
+  rankings  Json      // Store rankings as JSON
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([type, period])
+  @@map("leaderboards")
+}
+
+model SystemStats {
+  id                String    @id @default(cuid())
+  totalPools        Int       @default(0)
+  totalBets         Int       @default(0)
+  totalVolume       BigInt    @default(0)
+  totalUsers        Int       @default(0)
+  activePools       Int       @default(0)
+  averageRugScore   Float     @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("system_stats")
+}
+
+enum TransactionType {
+  BET_PLACED
+  BET_SETTLED
+  POOL_CREATED
+  POOL_CRASHED
+  XP_EARNED
+  ACHIEVEMENT_UNLOCKED
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum LeaderboardType {
+  TOP_TRADERS
+  TOP_WINNERS
+  TOP_VOLUME
+  TOP_XP
+}
+
+enum LeaderboardPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  ALL_TIME
+}
